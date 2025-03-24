@@ -226,28 +226,22 @@
 				<div class="screen-shold">
 					<div class="screen-slider">
 						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
+							<img src="images/resize/app_1.jpeg" alt="images" class="img-responsive">
 						</div>
 						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
+							<img src="images/resize/app_2.jpeg" alt="images" class="img-responsive">
 						</div>
 						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
+							<img src="images/resize/app_3.jpeg" alt="images" class="img-responsive">
 						</div>
 						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
+							<img src="images/resize/app_4.jpeg" alt="images" class="img-responsive">
 						</div>
 						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
+							<img src="images/resize/app_5.jpeg" alt="images" class="img-responsive">
 						</div>
 						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
-						</div>
-						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
-						</div>
-						<div class="slide">
-							<img src="http://placehold.it/288x525" alt="images" class="img-responsive">
+							<img src="images/resize/app_6.jpeg" alt="images" class="img-responsive">
 						</div>
 					</div>
 					<div class="cover">
@@ -281,28 +275,129 @@
 						</div>
 					</header><!-- main heading end here -->
 					<div class="row">
-						<div class="col-xs-12 col-sm-8 col-sm-push-2 col-md-6 col-md-push-3">
-							<form id="contactForm" data-toggle="validator">
-								<fieldset>
-									<div class="form-group">
-										<input type="text" id="name" placeholder="Your Name" class="form-control" required data-error="NEW ERROR MESSAGE">
-									</div>
-									<div class="form-group">
-										<input type="email" id="email" placeholder="Your Email" class="form-control" required data-error="NEW ERROR MESSAGE">
-									</div>
-									<div class="form-group">
-										<textarea name="message" class="form-control" id="message" cols="30" rows="10" placeholder="Your Message" required data-error="NEW ERROR MESSAGE"></textarea>
-									</div>
-									<div id="msgSubmit" class="form-message hidden"></div>
-									<div class="text-center">
-										<button class="btn btn-default main-bg-color text-uppercase" type="submit" id="form-submit">Send Message</button>
-									</div>
-								</fieldset>
-							</form>
-						</div>
-					</div>
-				</div>
-			</section>
+  <div class="col-xs-12 col-sm-8 col-sm-push-2 col-md-6 col-md-push-3">
+    <form id="contactForm">
+      <fieldset>
+        <div class="form-group">
+          <input type="text" id="name" placeholder="Your Name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <input type="email" id="email" placeholder="Your Email" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <textarea name="message" class="form-control" id="message" cols="30" rows="10" placeholder="Your Message" required></textarea>
+        </div>
+        <div id="msgSubmit" class="form-message hidden"></div>
+        <div class="text-center">
+          <button class="btn btn-default main-bg-color text-uppercase" type="button" id="form-submit" onclick="submitForm()">Send Message</button>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+
+<!-- Success Popup Modal -->
+<div id="successModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:1000;">
+  <div style="position:relative; top:50%; transform:translateY(-50%); margin:auto; width:90%; max-width:500px; background-color:#fff; padding:20px; border-radius:5px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+    <h3 style="color:#28a745; margin-top:0;">Message Sent Successfully!</h3>
+    <p>Thank you for contacting us. We have received your message and will get back to you soon.</p>
+    <div style="text-align:center; margin-top:20px;">
+      <button onclick="closeModal()" class="btn btn-default main-bg-color text-uppercase">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function submitForm() {
+  // Get form values
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const message = document.getElementById('message').value;
+  
+  // Check if all fields are filled
+  if (!name || !email || !message) {
+    showMessage("Please fill all fields", "error");
+    return;
+  }
+  
+  // Show loading indication
+  const submitButton = document.getElementById('form-submit');
+  submitButton.innerHTML = "Sending...";
+  submitButton.disabled = true;
+  
+  // Prepare data for SheetDB
+  const data = {
+    data: {
+      name: name,
+      email: email,
+      message: message
+    }
+  };
+  
+  // Send data to SheetDB using XMLHttpRequest (more compatible than fetch)
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://sheetdb.io/api/v1/uqetkvlcbqrjy', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    if (xhr.status === 201 || xhr.status === 200) {
+      // Reset form
+      document.getElementById('contactForm').reset();
+      
+      // Show success popup
+      document.getElementById('successModal').style.display = 'block';
+      
+      // Show success message
+      showMessage("Your message has been sent successfully!", "success");
+    } else {
+      // Show error message
+      showMessage("Error: " + xhr.responseText, "error");
+    }
+    
+    // Reset button
+    submitButton.innerHTML = "Send Message";
+    submitButton.disabled = false;
+  };
+  xhr.onerror = function() {
+    showMessage("Network error occurred. Please try again.", "error");
+    submitButton.innerHTML = "Send Message";
+    submitButton.disabled = false;
+  };
+  xhr.send(JSON.stringify(data));
+}
+
+function closeModal() {
+  document.getElementById('successModal').style.display = 'none';
+}
+
+function showMessage(text, type) {
+  const msgSubmit = document.getElementById('msgSubmit');
+  msgSubmit.className = 'form-message';
+  msgSubmit.classList.remove('hidden');
+  
+  if (type === 'success') {
+    msgSubmit.classList.add('text-success');
+    msgSubmit.classList.remove('text-danger');
+  } else {
+    msgSubmit.classList.add('text-danger');
+    msgSubmit.classList.remove('text-success');
+  }
+  
+  msgSubmit.innerHTML = text;
+  
+  // Hide message after 5 seconds
+  setTimeout(function() {
+    msgSubmit.classList.add('hidden');
+  }, 5000);
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  const modal = document.getElementById('successModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+</script>		</section>
 		</main>
 		<!-- main content wrapping section end here -->
 		<!-- footer of the page start here -->
